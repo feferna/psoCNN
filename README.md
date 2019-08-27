@@ -20,7 +20,6 @@ F. E. Fernandes Junior and G. G. Yen, “**Particle swarm optimization of deep n
 	month = sep,
 	year = {2019},
 	pages = {62--74},
-	file = {Fernandes Junior and Yen - 2019 - Particle swarm optimization of deep neural network.pdf:C\:\\Users\\ferna\\Zotero\\storage\\ANBGJ497\\Fernandes Junior and Yen - 2019 - Particle swarm optimization of deep neural network.pdf:application/pdf}
 }
 ```
 

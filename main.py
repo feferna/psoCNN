@@ -16,8 +16,8 @@ if __name__ == '__main__':
     # dataset = "mnist-rotated-with-background"
     # dataset = "rectangles"
     # dataset = "rectangles-images"
-    # dataset = "convex"
-    dataset = "fashion-mnist"
+    dataset = "convex"
+    # dataset = "fashion-mnist"
     # dataset = "mnist-random-background"
     # dataset = "mnist-background-images"
     
@@ -25,8 +25,8 @@ if __name__ == '__main__':
     number_iterations = 10
     population_size = 20
 
-    batch_size_pso = 64
-    batch_size_full_training = 64
+    batch_size_pso = 32
+    batch_size_full_training = 32
     
     epochs_pso = 1
     epochs_full_training = 100
@@ -61,11 +61,12 @@ if __name__ == '__main__':
     for i in range(number_runs):
         print("Run number: " + str(i))
         start_time = time.time()
-        pso = psoCNN(dataset=dataset, n_iter=number_iterations, pop_size=population_size, \
-            batch_size=batch_size_pso, epochs=epochs_pso, min_layer=min_layer, max_layer=max_layer, \
-            conv_prob=probability_convolution, pool_prob=probability_pooling, \
-            fc_prob=probability_fully_connected, max_conv_kernel=max_conv_kernel_size, \
-            max_out_ch=max_conv_output_channels, max_fc_neurons=max_fully_connected_neurons, dropout_rate=dropout)
+        pso = psoCNN(dataset=dataset, n_iter=number_iterations, pop_size=population_size,
+                     batch_size=batch_size_pso, epochs=epochs_pso, min_layer=min_layer, max_layer=max_layer,
+                     conv_prob=probability_convolution, pool_prob=probability_pooling,
+                     fc_prob=probability_fully_connected, max_conv_kernel=max_conv_kernel_size,
+                     max_out_ch=max_conv_output_channels, max_fc_neurons=max_fully_connected_neurons,
+                     dropout_rate=dropout)
 
         pso.fit(Cg=Cg, dropout_rate=dropout)
 

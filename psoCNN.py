@@ -193,11 +193,11 @@ class psoCNN:
         test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=batch_size)
         self.gBest.model_delete()
         
-        self.gBest_acc[0] = hist.history['acc'][-1]
+        self.gBest_acc[0] = hist.history['accuracy'][-1]
         self.gBest_test_acc[0] = test_metrics[1]
         
-        self.population.particle[0].acc = hist.history['acc'][-1]
-        self.population.particle[0].pBest.acc = hist.history['acc'][-1]
+        self.population.particle[0].acc = hist.history['accuracy'][-1]
+        self.population.particle[0].pBest.acc = hist.history['accuracy'][-1]
 
         print("Current gBest acc: " + str(self.gBest_acc[0]) + "\n")
         print("Current gBest test acc: " + str(self.gBest_test_acc[0]) + "\n")
@@ -210,8 +210,8 @@ class psoCNN:
             self.population.particle[i].model_compile(dropout_rate)
             hist = self.population.particle[i].model_fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
            
-            self.population.particle[i].acc = hist.history['acc'][-1]
-            self.population.particle[i].pBest.acc = hist.history['acc'][-1]
+            self.population.particle[i].acc = hist.history['accuracy'][-1]
+            self.population.particle[i].pBest.acc = hist.history['accuracy'][-1]
 
             if self.population.particle[i].pBest.acc >= self.gBest_acc[0]:
                 print("Found a new gBest.")
@@ -249,7 +249,7 @@ class psoCNN:
                 hist = self.population.particle[j].model_fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=self.epochs)
                 self.population.particle[j].model_delete()
 
-                self.population.particle[j].acc = hist.history['acc'][-1]
+                self.population.particle[j].acc = hist.history['accuracy'][-1]
                 
                 f_test = self.population.particle[j].acc
                 pBest_acc = self.population.particle[j].pBest.acc

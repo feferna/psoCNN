@@ -27,8 +27,8 @@ F. E. Fernandes Junior and G. G. Yen, “**Particle swarm optimization of deep n
 To run this code, you will need the following packages installed on you machine:
 
 - Python 3.7;
-- Tensorflow 1.14;
-- Keras 2.2.4;
+- Tensorflow 2.2.0;
+- Keras 2.3.1;
 - Numpy 1.16.4;
 - Matplotplib 3.1.0.
 

@@ -17,12 +17,10 @@ from keras.layers.normalization import BatchNormalization
 import os
 import tensorflow as tf
 
-# Hide Tensorflow INFOS and WARNINGS
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 
 class Particle:
-    def __init__(self, min_layer, max_layer, max_pool_layers, input_width, input_height, input_channels, \
-        conv_prob, pool_prob, fc_prob, max_conv_kernel, max_out_ch, max_fc_neurons, output_dim):
+    def __init__(self, min_layer, max_layer, max_pool_layers, input_width, input_height, input_channels,
+                 conv_prob, pool_prob, fc_prob, max_conv_kernel, max_out_ch, max_fc_neurons, output_dim):
         self.input_width = input_width
         self.input_height = input_height
         self.input_channels = input_channels
@@ -61,7 +59,6 @@ class Particle:
         self.model = None
         self.pBest = deepcopy(self)
 
-    
     def __str__(self):
         string = ""
         for z in range(len(self.layers)):
@@ -89,8 +86,11 @@ class Particle:
             if layer_type < conv_prob:
                 self.layers = utils.add_conv(self.layers, self.max_out_ch, self.max_conv_kernel)
 
-            elif layer_type >= conv_prob and layer_type <= pool_prob:
-                self.layers, self.num_pool_layers = utils.add_pool(self.layers, self.fc_prob, self.num_pool_layers, self.max_pool_layers, self.max_out_ch, self.max_conv_kernel, self.max_fc_neurons, self.output_dim)
+            elif conv_prob <= layer_type <= pool_prob:
+                self.layers, self.num_pool_layers = utils.add_pool(self.layers, self.fc_prob, self.num_pool_layers,
+                                                                   self.max_pool_layers, self.max_out_ch,
+                                                                   self.max_conv_kernel, self.max_fc_neurons,
+                                                                   self.output_dim)
             
             elif layer_type >= fc_prob:
                 self.layers = utils.add_fc(self.layers, self.max_fc_neurons)
@@ -121,7 +121,6 @@ class Particle:
                 if self.num_pool_layers >= self.max_pool_layers:
                     list_layers[i]["type"] = "remove"
 
-
         # Now, fix the inputs of each conv and pool layers
         updated_list_layers = []
         
@@ -141,8 +140,8 @@ class Particle:
 
         return updated_list_layers
 
-    ##### Model methods ####
-    def model_compile(self, dropout_rate):
+    # Model methods
+    def _model_compile(self, dropout_rate):
         list_layers = self.layers
         self.model = Sequential()
 
@@ -155,12 +154,17 @@ class Particle:
                     in_w = self.input_width
                     in_h = self.input_height
                     in_c = self.input_channels
-                    self.model.add(Conv2D(n_out_filters, kernel_size, strides=(1,1), padding="same", data_format="channels_last", kernel_initializer='he_normal', bias_initializer='he_normal', activation=None, input_shape=(in_w, in_h, in_c)))
+                    self.model.add(
+                        Conv2D(n_out_filters, kernel_size, strides=(1, 1), padding="same", data_format="channels_last",
+                               kernel_initializer='he_normal', bias_initializer='he_normal', activation=None,
+                               input_shape=(in_w, in_h, in_c)))
                     self.model.add(BatchNormalization())
                     self.model.add(Activation("relu"))
                 else:
                     self.model.add(Dropout(dropout_rate))
-                    self.model.add(Conv2D(n_out_filters, kernel_size, strides=(1,1), padding="same", kernel_initializer='he_normal', bias_initializer='he_normal', activation=None))
+                    self.model.add(Conv2D(n_out_filters, kernel_size, strides=(1, 1), padding="same",
+                                          kernel_initializer='he_normal', bias_initializer='he_normal',
+                                          activation=None))
                     self.model.add(BatchNormalization())
                     self.model.add(Activation("relu"))
 
@@ -173,41 +177,66 @@ class Particle:
                 kernel_size = list_layers[i]["kernel"]
 
                 self.model.add(AveragePooling2D(pool_size=(3, 3), strides=2))
-            
+
             if list_layers[i]["type"] == "fc":
-                if list_layers[i-1]["type"] != "fc":
+                if list_layers[i - 1]["type"] != "fc":
                     self.model.add(Flatten())
 
                 self.model.add(Dropout(dropout_rate))
 
                 if i == len(list_layers) - 1:
-                    self.model.add(Dense(list_layers[i]["ou_c"], kernel_initializer='he_normal', bias_initializer='he_normal', activation=None))
+                    self.model.add(
+                        Dense(list_layers[i]["ou_c"], kernel_initializer='he_normal', bias_initializer='he_normal',
+                              activation=None))
                     self.model.add(BatchNormalization())
                     self.model.add(Activation("softmax"))
                 else:
-                    self.model.add(Dense(list_layers[i]["ou_c"], kernel_initializer='he_normal', bias_initializer='he_normal', kernel_regularizer=regularizers.l2(0.01), activation=None))
+                    self.model.add(
+                        Dense(list_layers[i]["ou_c"], kernel_initializer='he_normal', bias_initializer='he_normal',
+                              kernel_regularizer=regularizers.l2(0.01), activation=None))
                     self.model.add(BatchNormalization())
                     self.model.add(Activation("relu"))
 
         adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, decay=0.0)
 
         self.model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=["accuracy"])
-    
 
-    def model_fit(self, x_train, y_train, batch_size, epochs):
-        # TODO: add option to only use a sample size of the dataset
-
-        hist = self.model.fit(x=x_train, y=y_train, validation_split=0.0, batch_size=batch_size, epochs=epochs)
-
-        return hist
-
-    def model_fit_complete(self, x_train, y_train, batch_size, epochs):
-        hist = self.model.fit(x=x_train, y=y_train, validation_split=0.0, batch_size=batch_size, epochs=epochs)
-
-        return hist
-    
-    def model_delete(self):
+    def _model_delete(self):
         # This is used to free up memory during PSO training
         del self.model
         keras.backend.clear_session()
         self.model = None
+
+    def model_evaluate(self, dropout_rate, x_train, y_train, x_test, y_test, batch_size, epochs):
+        self._model_compile(dropout_rate)
+        print("\tModel Evaluation - Training Model: ")
+
+        hist = self.model.fit(x=x_train, y=y_train, validation_split=0.0, batch_size=batch_size, epochs=epochs)
+
+        print("\tModel Evaluation - Testing Model: ")
+        test_metrics = self.model.evaluate(x=x_test, y=y_test, batch_size=batch_size)
+
+        return hist, test_metrics
+
+    def model_fit(self, dropout_rate, x_train, y_train, batch_size, epochs):
+        # TODO: add option to only use a sample size of the dataset
+
+        self._model_compile(dropout_rate)
+
+        hist = self.model.fit(x=x_train, y=y_train, validation_split=0.0, batch_size=batch_size, epochs=epochs)
+
+        self._model_delete()
+
+        return hist
+
+    def model_fit_complete(self, dropout_rate, x_train, y_train, x_test, y_test, batch_size, epochs):
+        self._model_compile(dropout_rate)
+
+        hist = self.model.fit(x=x_train, y=y_train, validation_split=0.0, batch_size=batch_size, epochs=epochs)
+
+        print("\nEvaluating gBest model on the test set...")
+        metrics = self.model.evaluate(x=x_test, y=y_test, batch_size=batch_size)
+
+        self._model_delete()
+
+        return hist, metrics

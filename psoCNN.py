@@ -209,6 +209,7 @@ class psoCNN:
 
             self.population.particle[i].model_compile(dropout_rate)
             hist = self.population.particle[i].model_fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
+            self.population.particle[i].model_delete()
            
             self.population.particle[i].acc = hist.history['accuracy'][-1]
             self.population.particle[i].pBest.acc = hist.history['accuracy'][-1]
@@ -219,11 +220,11 @@ class psoCNN:
                 self.gBest_acc[0] = self.population.particle[i].pBest.acc
                 print("New gBest acc: " + str(self.gBest_acc[0]))
 
+                self.gBest.model_compile(dropout_rate)
                 test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=batch_size)
                 self.gBest_test_acc[0] = test_metrics[1]
                 print("New gBest test acc: " + str(self.gBest_acc[0]))
             
-            self.population.particle[i].model_delete()
             self.gBest.model_delete()
 
 
@@ -280,8 +281,12 @@ class psoCNN:
 
     def fit_gBest(self, batch_size, epochs, dropout_rate):
         print("\nFurther training gBest model...")
-        self.gBest.model_compile(dropout_rate)        
-        trainable_count = int(np.sum([keras.backend.count_params(p) for p in set(self.gBest.model.trainable_weights)]))
+        self.gBest.model_compile(dropout_rate)
+        
+        trainable_count = 0
+        for i in range(len(self.gBest.model.trainable_weights)):
+            trainable_count += keras.backend.count_params(self.gBest.model.trainable_weights[i])
+
         print("gBest's number of trainable parameters: " + str(trainable_count))
         self.gBest.model_fit_complete(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
 

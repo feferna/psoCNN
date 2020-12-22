@@ -31,29 +31,20 @@ Run each line of command in a terminal window:
 
 	```
 	git clone https://github.com/feferna/psoCNN.git
-	```
-
-	```
+	
 	cd psoCNN
-	```
-
-	```
+	
 	sudo apt install python3-venv
-	```
-
-	```
+	
 	python3 -m venv ./psoCNN_venv
-	```
-
-	```
+	
 	source ./psoCNN_venv/bin/activate
-	```
-
-	```
+	
 	pip install -r requirements.txt
 	```
 
 **Note1:** If your system has all the packages listed in the file requirements.txt, the code presented here should be able to run on Windows, macOS, or Linux.
+
 **Note2:** To run Tensorflow using your Nvidia GPU, you should install the Nvidia CUDA Toolkit library following this link: https://www.tensorflow.org/install/gpu
 
 ## Usage

@@ -11,8 +11,8 @@ import numpy as np
 from copy import deepcopy
 
 class psoCNN:
-    def __init__(self, dataset, n_iter, pop_size, batch_size, epochs, min_layer, max_layer, \
-        conv_prob, pool_prob, fc_prob, max_conv_kernel, max_out_ch, max_fc_neurons, dropout_rate):
+    def __init__(self, dataset, n_iter, pop_size, batch_size, epochs, min_layer, max_layer,
+                 conv_prob, pool_prob, fc_prob, max_conv_kernel, max_out_ch, max_fc_neurons, dropout_rate):
         
         self.pop_size = pop_size
         self.n_iter = n_iter
@@ -188,10 +188,9 @@ class psoCNN:
         print("Verifying accuracy of the current gBest...")
         print(self.population.particle[0])
         self.gBest = deepcopy(self.population.particle[0])
-        self.gBest.model_compile(dropout_rate)
-        hist = self.gBest.model_fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
-        test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=batch_size)
-        self.gBest.model_delete()
+        #self.gBest.model_compile(dropout_rate)
+        hist, test_metrics = self.gBest.model_evaluate(dropout_rate, self.x_train, self.y_train, self.x_test,
+                                                       self.y_test, batch_size=batch_size, epochs=epochs)
         
         self.gBest_acc[0] = hist.history['accuracy'][-1]
         self.gBest_test_acc[0] = test_metrics[1]
@@ -246,9 +245,7 @@ class psoCNN:
                 print(self.population.particle[j])
 
                 # Compute the acc in the updated particle
-                self.population.particle[j].model_compile(dropout_rate)
-                hist = self.population.particle[j].model_fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=self.epochs)
-                self.population.particle[j].model_delete()
+                hist = self.population.particle[j].model_fit(dropout_rate, self.x_train, self.y_train, batch_size=self.batch_size, epochs=self.epochs)
 
                 self.population.particle[j].acc = hist.history['accuracy'][-1]
                 
@@ -266,10 +263,13 @@ class psoCNN:
                         print("Found a new gBest.")
                         gBest_acc = pBest_acc
                         self.gBest = deepcopy(self.population.particle[j])
-                        self.gBest.model_compile(dropout_rate)
-                        hist = self.gBest.model_fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=self.epochs)
-                        test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=self.batch_size)
-                        self.gBest.model_delete()
+
+                        hist, test_metrics = self.gBest.model_evaluate(dropout_rate, self.x_train, self.y_train,
+                                                                       self.x_test,
+                                                                       self.y_test,
+                                                                       batch_size=self.batch_size,
+                                                                       epochs=self.epochs)
+
                         gBest_test_acc = test_metrics[1]
 
                 
@@ -288,14 +288,10 @@ class psoCNN:
             trainable_count += keras.backend.count_params(self.gBest.model.trainable_weights[i])
 
         print("gBest's number of trainable parameters: " + str(trainable_count))
-        self.gBest.model_fit_complete(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
-
-        return trainable_count
-    
-    def evaluate_gBest(self, batch_size):
-        print("\nEvaluating gBest model on the test set...")
-        
-        metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=batch_size)
+        _, metrics = self.gBest.model_fit_complete(dropout_rate, self.x_train, self.y_train, self.x_test, self.y_test,
+                                                   batch_size=batch_size,
+                                                   epochs=epochs)
 
         print("\ngBest model loss in the test set: " + str(metrics[0]) + " - Test set accuracy: " + str(metrics[1]))
-        return metrics
+
+        return trainable_count, metrics

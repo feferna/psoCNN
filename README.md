@@ -29,19 +29,19 @@ F. E. Fernandes Junior and G. G. Yen, “**Particle swarm optimization of deep n
 
 Run each line of command in a terminal window:
 
-	```
-	git clone https://github.com/feferna/psoCNN.git
-	
-	cd psoCNN
-	
-	sudo apt install python3-venv
-	
-	python3 -m venv ./psoCNN_venv
-	
-	source ./psoCNN_venv/bin/activate
-	
-	pip install -r requirements.txt
-	```
+```
+git clone https://github.com/feferna/psoCNN.git
+
+cd psoCNN
+
+sudo apt install python3-venv
+
+python3 -m venv ./psoCNN_venv
+
+source ./psoCNN_venv/bin/activate
+
+pip install -r requirements.txt
+```
 
 **Note1:** If your system has all the packages listed in the file requirements.txt, the code presented here should be able to run on Windows, macOS, or Linux.
 

@@ -93,10 +93,12 @@ if __name__ == '__main__':
 
         runs_time.append(running_time)
 
-        # Fully train and Evaluate the gBest model found
-        n_parameters, gBest_metrics = pso.fit_gBest(batch_size=batch_size_full_training, epochs=epochs_full_training,
-                                                    dropout_rate=dropout)
+        # Fully train the gBest model found
+        n_parameters = pso.fit_gBest(batch_size=batch_size_full_training, epochs=epochs_full_training, dropout_rate=dropout)
         all_gbest_par.append(n_parameters)
+
+        # Evaluate the fully trained gBest model
+        gBest_metrics = pso.evaluate_gBest(batch_size=batch_size_full_training)
 
         if gBest_metrics[1] >= best_gBest_acc:
             best_gBest_acc = gBest_metrics[1]
@@ -115,7 +117,7 @@ if __name__ == '__main__':
 
         print("This run took: " + str(running_time) + " seconds.")
 
-        # Compute mean accuracy of all runs
+         # Compute mean accuracy of all runs
         all_gBest_mean_metrics = np.mean(all_gBest_metrics, axis=0)
 
         np.save(results_path + "/time_to_run.npy", runs_time)

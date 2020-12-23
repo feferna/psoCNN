@@ -32,6 +32,8 @@ Make sure you have Anaconda installed in your system. Then, run each command in 
 ```
 git clone https://github.com/feferna/psoCNN.git
 
+cd psoCNN
+
 conda env create -f psoCNN_env.yml
 
 conda activate psoCNN

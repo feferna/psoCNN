@@ -219,7 +219,8 @@ class psoCNN:
                 self.gBest = deepcopy(self.population.particle[i])
                 self.gBest_acc[0] = self.population.particle[i].pBest.acc
                 print("New gBest acc: " + str(self.gBest_acc[0]))
-
+                
+                self.gBest.model_compile(dropout_rate)
                 test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=batch_size)
                 self.gBest_test_acc[0] = test_metrics[1]
                 print("New gBest test acc: " + str(self.gBest_acc[0]))
@@ -265,6 +266,7 @@ class psoCNN:
                         print("Found a new gBest.")
                         gBest_acc = pBest_acc
                         self.gBest = deepcopy(self.population.particle[j])
+                        
                         self.gBest.model_compile(dropout_rate)
                         hist = self.gBest.model_fit(self.x_train, self.y_train, batch_size=self.batch_size, epochs=self.epochs)
                         test_metrics = self.gBest.model.evaluate(x=self.x_test, y=self.y_test, batch_size=self.batch_size)

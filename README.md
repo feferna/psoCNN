@@ -25,7 +25,7 @@ F. E. Fernandes Junior and G. G. Yen, “**Particle swarm optimization of deep n
 
 **Note1:** If your system has all these packages installed, the code presented here should be able to run on Windows, macOS, or Linux.
 
-## Installation Anaconda Python
+## Installation using Anaconda Python
 
 Make sure you have Anaconda installed in your system. Then, run each command in a terminal window:
 

@@ -43,6 +43,8 @@ conda activate psoCNN
 
 **Note2:** The file psoCNN_env.yml installs the Nvidia CUDA Toolkit and cuDNN library necessary to run the project in an Nvidia GPU.
 
+**Note3:** This code only works with Tensorflow 1.14. Do not try to use Tensorflow 2.X because you will find inconsistent results!
+
 ## Usage
 
 1. Download the following datasets and extract them to their corresponding folders inside the ```datasets``` folder:
@@ -59,6 +61,8 @@ conda activate psoCNN
 2. Now, you can test the algorithm by running the ```main.py``` file:
 
 	```
+	export TF_FORCE_GPU_ALLOW_GROWTH=true
+	
 	python main.py
 	```
 
